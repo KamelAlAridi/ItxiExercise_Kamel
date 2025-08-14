@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Button} from 'react-native';
 import React from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {OnboardingStackParams} from '../types/types';
@@ -9,6 +9,10 @@ export default function EnterCompIDScreen({navigation}: Props) {
   return (
     <View style={styles.container}>
       <Text>EnterCompIDScreen</Text>
+      <Button
+        title="Continue"
+        onPress={() => navigation.navigate('PickVoice')}
+      />
     </View>
   );
 }
