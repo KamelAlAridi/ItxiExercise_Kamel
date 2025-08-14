@@ -1,27 +1,53 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import {
-  SafeAreaView,
-  StatusBar,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import React, {useEffect, useState} from 'react';
+import {SafeAreaView, StatusBar, useColorScheme} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import SplashScreen from './src/screens/SplashScreen';
+import WelcomeScreen from './src/screens/WelcomeScreen';
+import EnterCompIDScreen from './src/screens/EnterCompIDScreen';
+import {NavigationContainer} from '@react-navigation/native';
+import {OnboardingStackParams, RootStackParams} from './src/types/types';
+import PickVoiceScreen from './src/screens/PickVoiceScreen';
+import MainScreen from './src/screens/MainScreen';
+
+const OnboardingStack = createNativeStackNavigator<OnboardingStackParams>();
+const RootStack = createNativeStackNavigator<RootStackParams>();
+
+function OnboardingStackScreen() {
+  return (
+    <OnboardingStack.Navigator initialRouteName="Welcome">
+      <OnboardingStack.Screen name="Welcome" component={WelcomeScreen} />
+      <OnboardingStack.Screen
+        name="EnterCompanyId"
+        component={EnterCompIDScreen}
+        options={{title: 'Enter Company ID'}}
+      />
+      <OnboardingStack.Screen
+        name="PickVoice"
+        component={PickVoiceScreen}
+        options={{
+          title: 'Select Voice',
+          headerBackTitle: 'Back',
+        }}
+      />
+    </OnboardingStack.Navigator>
+  );
+}
 
 function App(): JSX.Element {
+  const [showSplash, setShowSplash] = useState<Boolean>(true);
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    flex: 1,
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -29,9 +55,19 @@ function App(): JSX.Element {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <View>
-        <Text>hello</Text>
-      </View>
+      <NavigationContainer>
+        {showSplash ? (
+          <SplashScreen />
+        ) : (
+          <RootStack.Navigator screenOptions={{headerShown: false}}>
+            <RootStack.Screen
+              name="OnboardingStack"
+              component={OnboardingStackScreen}
+            />
+            <RootStack.Screen name="MainStack" component={MainScreen} />
+          </RootStack.Navigator>
+        )}
+      </NavigationContainer>
     </SafeAreaView>
   );
 }
