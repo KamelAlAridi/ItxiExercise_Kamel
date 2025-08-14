@@ -20,7 +20,8 @@ export const saveCompanyVoice = async (
   companyId: string,
   voice: string,
 ) => {
-  const insertQuery = `INSERT OR REPLACE INTO company_voice (company_id, voice) VALUES (?, ?)`;
+  await db.executeSql(`DELETE FROM company_voice`);
+  const insertQuery = `INSERT INTO company_voice (company_id, voice) VALUES (?, ?)`;
   await db.executeSql(insertQuery, [companyId, voice]);
 };
 
