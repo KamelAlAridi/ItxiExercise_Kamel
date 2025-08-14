@@ -36,18 +36,12 @@ function OnboardingStackScreen() {
 }
 
 function App(): JSX.Element {
-  const [showSplash, setShowSplash] = useState<Boolean>(true);
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
     flex: 1,
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -56,17 +50,14 @@ function App(): JSX.Element {
         backgroundColor={backgroundStyle.backgroundColor}
       />
       <NavigationContainer>
-        {showSplash ? (
-          <SplashScreen />
-        ) : (
-          <RootStack.Navigator screenOptions={{headerShown: false}}>
-            <RootStack.Screen
-              name="OnboardingStack"
-              component={OnboardingStackScreen}
-            />
-            <RootStack.Screen name="MainStack" component={MainScreen} />
-          </RootStack.Navigator>
-        )}
+        <RootStack.Navigator screenOptions={{headerShown: false}}>
+          <RootStack.Screen name="Splash" component={SplashScreen} />
+          <RootStack.Screen
+            name="OnboardingStack"
+            component={OnboardingStackScreen}
+          />
+          <RootStack.Screen name="MainStack" component={MainScreen} />
+        </RootStack.Navigator>
       </NavigationContainer>
     </SafeAreaView>
   );

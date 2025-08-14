@@ -1,6 +1,19 @@
 import {StyleSheet, Text, View} from 'react-native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {RootStackParams} from '../types/types';
+import {useEffect} from 'react';
 
-export default function SplashScreen() {
+type Props = NativeStackScreenProps<RootStackParams, 'Splash'>;
+
+export default function SplashScreen({navigation}: Props) {
+  useEffect(() => {
+    const timer = setTimeout(
+      () => navigation.navigate('OnboardingStack'),
+      3000,
+    );
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Splash Screen</Text>
