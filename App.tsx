@@ -17,7 +17,11 @@ const RootStack = createNativeStackNavigator<RootStackParams>();
 function OnboardingStackScreen() {
   return (
     <OnboardingStack.Navigator initialRouteName="Welcome">
-      <OnboardingStack.Screen name="Welcome" component={WelcomeScreen} />
+      <OnboardingStack.Screen
+        name="Welcome"
+        component={WelcomeScreen}
+        options={{headerBackVisible: false}}
+      />
       <OnboardingStack.Screen
         name="EnterCompanyId"
         component={EnterCompIDScreen}
