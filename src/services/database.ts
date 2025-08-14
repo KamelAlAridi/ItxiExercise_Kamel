@@ -8,9 +8,10 @@ export const getDBConnection = async () => {
 
 export const createTable = async (db: SQLite.SQLiteDatabase) => {
   const query = `CREATE TABLE IF NOT EXISTS company_voice (
-      company_id TEXT PRIMARY KEY,
-      voice TEXT NOT NULL
-    );`;
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company_id TEXT NOT NULL,
+    voice TEXT NOT NULL
+  );`;
   await db.executeSql(query);
 };
 
@@ -30,4 +31,13 @@ export const getCompanyVoice = async (db: SQLite.SQLiteDatabase) => {
 
 export const deleteCompanyVoice = async (db: SQLite.SQLiteDatabase) => {
   await db.executeSql(`DELETE FROM company_voice`);
+};
+
+export const updateCompanyId = async (
+  db: SQLite.SQLiteDatabase,
+  id: number,
+  newCompanyId: string,
+) => {
+  const updateQuery = `UPDATE company_voice SET company_id = ? WHERE id = ?`;
+  await db.executeSql(updateQuery, [newCompanyId, id]);
 };
