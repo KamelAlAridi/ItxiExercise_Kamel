@@ -2,8 +2,8 @@ import {NavigatorScreenParams} from '@react-navigation/native';
 
 export type OnboardingStackParams = {
   Welcome: undefined;
-  EnterCompanyId: undefined;
-  PickVoice: undefined;
+  EnterCompanyId: {fromSettings?: boolean} | undefined;
+  PickVoice: {fromSettings?: boolean} | undefined;
 };
 
 export type RootStackParams = {
@@ -17,6 +17,6 @@ export type RootStackParams = {
 export type SettingsStackParams = {
   Settings: undefined;
   SetCompanyId: undefined;
-  EnterCompanyId: undefined;
-  PickVoice: undefined;
+  EnterCompanyId: {fromSettings?: boolean} | undefined;
+  PickVoice: {fromSettings?: boolean} | undefined;
 };
