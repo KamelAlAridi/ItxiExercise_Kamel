@@ -2,7 +2,7 @@ import {View, Text, StyleSheet, Button, Alert, TextInput} from 'react-native';
 import React, {useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {OnboardingStackParams} from '../types/types';
-import {getDBConnection, saveCompanyVoice} from '../services/database';
+import {getDBConnection, addCompany} from '../services/database';
 
 type Props = NativeStackScreenProps<OnboardingStackParams, 'EnterCompanyId'>;
 
@@ -20,7 +20,7 @@ export default function EnterCompIDScreen({navigation}: Props) {
     }
 
     const db = await getDBConnection();
-    await saveCompanyVoice(db, companyId, '');
+    await addCompany(db, companyId);
     navigation.navigate('PickVoice');
   };
 

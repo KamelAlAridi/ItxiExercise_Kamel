@@ -3,8 +3,8 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParams} from '../types/types';
 import {useEffect} from 'react';
 import {
-  createTable,
-  getCompanyVoice,
+  createTables,
+  getCompanies,
   getDBConnection,
 } from '../services/database';
 
@@ -16,15 +16,15 @@ export default function SplashScreen({navigation}: Props) {
       const startTime = Date.now();
 
       const db = await getDBConnection();
-      await createTable(db);
+      await createTables(db);
 
-      const saved = await getCompanyVoice(db);
+      const companies = await getCompanies(db);
 
       const elapsed = Date.now() - startTime;
       const remaining = Math.max(0, 3000 - elapsed);
 
       setTimeout(() => {
-        if (saved) {
+        if (companies.length > 0) {
           navigation.navigate('MainStack');
         } else {
           navigation.navigate('OnboardingStack');
