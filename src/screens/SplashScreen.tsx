@@ -7,8 +7,8 @@ import {
   createTables,
   getCompanies,
   getDBConnection,
-  //getVoice,
 } from '../services/database';
+import GradientCircles from '../components/GradientCircles';
 
 type Props = NativeStackScreenProps<RootStackParams, 'Splash'>;
 
@@ -21,7 +21,6 @@ export default function SplashScreen({navigation}: Props) {
       await createTables(db);
 
       const companies = await getCompanies(db);
-      //const voice = await getVoice(db);
 
       const elapsed = Date.now() - startTime;
       const remaining = Math.max(0, 3000 - elapsed);
@@ -40,10 +39,7 @@ export default function SplashScreen({navigation}: Props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.background}>
-        <View style={styles.gradientCircle} />
-        <View style={[styles.gradientCircle, styles.bottomCircle]} />
-      </View>
+      <GradientCircles />
       <View style={styles.content}>
         <Text style={styles.title}>Getting Started</Text>
         <ActivityIndicator size="large" color="#4A5568" />
@@ -57,26 +53,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: '#F9FAFB',
-  },
-  background: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
-  },
-  gradientCircle: {
-    position: 'absolute',
-    width: 400,
-    height: 400,
-    borderRadius: 200,
-    backgroundColor: 'rgba(28, 56, 179, 0.05)',
-    top: -100,
-    left: -100,
-  },
-  bottomCircle: {
-    top: 'auto',
-    left: 'auto',
-    bottom: -150,
-    right: -150,
-    backgroundColor: 'rgba(102, 126, 234, 0.03)',
   },
   content: {
     alignItems: 'center',
