@@ -1,5 +1,5 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {SafeAreaView, StatusBar, useColorScheme} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
@@ -10,6 +10,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {OnboardingStackParams, RootStackParams} from './src/types/types';
 import PickVoiceScreen from './src/screens/PickVoiceScreen';
 import MainScreen from './src/screens/MainScreen';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 const OnboardingStack = createNativeStackNavigator<OnboardingStackParams>();
 const RootStack = createNativeStackNavigator<RootStackParams>();
@@ -48,22 +49,24 @@ function App(): JSX.Element {
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <NavigationContainer>
-        <RootStack.Navigator screenOptions={{headerShown: false}}>
-          <RootStack.Screen name="Splash" component={SplashScreen} />
-          <RootStack.Screen
-            name="OnboardingStack"
-            component={OnboardingStackScreen}
-          />
-          <RootStack.Screen name="MainStack" component={MainScreen} />
-        </RootStack.Navigator>
-      </NavigationContainer>
-    </SafeAreaView>
+    <GestureHandlerRootView style={{flex: 1}}>
+      <SafeAreaView style={backgroundStyle}>
+        <StatusBar
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+          backgroundColor={backgroundStyle.backgroundColor}
+        />
+        <NavigationContainer>
+          <RootStack.Navigator screenOptions={{headerShown: false}}>
+            <RootStack.Screen name="Splash" component={SplashScreen} />
+            <RootStack.Screen
+              name="OnboardingStack"
+              component={OnboardingStackScreen}
+            />
+            <RootStack.Screen name="MainStack" component={MainScreen} />
+          </RootStack.Navigator>
+        </NavigationContainer>
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 }
 
