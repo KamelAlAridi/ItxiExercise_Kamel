@@ -9,7 +9,7 @@ type Props = NativeStackScreenProps<OnboardingStackParams, 'EnterCompanyId'>;
 export default function EnterCompIDScreen({navigation}: Props) {
   const [companyId, setCompanyId] = useState<string>('');
 
-  const companyIdPattern: RegExp = /^[A-Z]{3,4}-\d{4}$/;
+  const companyIdPattern: RegExp = /^[A-Z]{3}-\d{4}$/;
 
   const handleContinue = async (): Promise<void> => {
     const trimmedId: string = companyId.trim();
