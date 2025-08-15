@@ -32,7 +32,11 @@ function App(): JSX.Element {
         />
         <NavigationContainer>
           <RootStack.Navigator>
-            <RootStack.Screen name="Splash" component={SplashScreen} />
+            <RootStack.Screen
+              name="Splash"
+              component={SplashScreen}
+              options={{headerShown: false}}
+            />
             <RootStack.Screen
               name="OnboardingStack"
               component={OnboardingStackScreen}

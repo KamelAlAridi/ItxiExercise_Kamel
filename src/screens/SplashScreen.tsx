@@ -6,6 +6,7 @@ import {
   createTables,
   getCompanies,
   getDBConnection,
+  getVoice,
 } from '../services/database';
 
 type Props = NativeStackScreenProps<RootStackParams, 'Splash'>;
@@ -19,12 +20,13 @@ export default function SplashScreen({navigation}: Props) {
       await createTables(db);
 
       const companies = await getCompanies(db);
+      const voice = await getVoice(db);
 
       const elapsed = Date.now() - startTime;
       const remaining = Math.max(0, 3000 - elapsed);
 
       setTimeout(() => {
-        if (companies.length > 0) {
+        if (companies.length > 0 || voice) {
           navigation.navigate('MainStack');
         } else {
           navigation.navigate('OnboardingStack');

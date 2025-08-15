@@ -27,11 +27,19 @@ export default function EnterCompIDScreen({navigation, route}: Props) {
     }
 
     const db = await getDBConnection();
-    await addCompany(db, companyId);
+    const wasAdded = await addCompany(db, companyId);
+
+    if (!wasAdded) {
+      Alert.alert('This company ID already exists.');
+      setMessage('');
+      return;
+    }
+
     if (!fromSettings) {
       navigation.navigate('PickVoice');
     } else {
       setMessage('Company Id added');
+      setCompanyId('');
     }
   };
 
