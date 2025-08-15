@@ -6,39 +6,69 @@ export const getDBConnection = async () => {
   return SQLite.openDatabase({name: 'app.db', location: 'default'});
 };
 
-export const createTable = async (db: SQLite.SQLiteDatabase) => {
-  const query = `CREATE TABLE IF NOT EXISTS company_voice (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    company_id TEXT NOT NULL,
-    voice TEXT NOT NULL
-  );`;
-  await db.executeSql(query);
+export const createTables = async (
+  db: SQLite.SQLiteDatabase,
+): Promise<void> => {
+  const companyTable = `
+    CREATE TABLE IF NOT EXISTS companies (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      company_id TEXT NOT NULL UNIQUE
+    );
+  `;
+
+  const settingsTable = `
+    CREATE TABLE IF NOT EXISTS settings (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      voice TEXT NOT NULL
+    );
+  `;
+
+  await db.executeSql(companyTable);
+  await db.executeSql(settingsTable);
+
+  const res = await db.executeSql(`SELECT * FROM settings WHERE id = 1`);
+  if (res[0].rows.length === 0) {
+    await db.executeSql(`INSERT INTO settings (id, voice) VALUES (1, '')`);
+  }
 };
 
-export const saveCompanyVoice = async (
+export const addCompany = async (
   db: SQLite.SQLiteDatabase,
   companyId: string,
-  voice: string,
-) => {
-  await db.executeSql(`DELETE FROM company_voice`);
-  const insertQuery = `INSERT INTO company_voice (company_id, voice) VALUES (?, ?)`;
-  await db.executeSql(insertQuery, [companyId, voice]);
+): Promise<void> => {
+  await db.executeSql(
+    `INSERT OR IGNORE INTO companies (company_id) VALUES (?)`,
+    [companyId],
+  );
 };
 
-export const getCompanyVoice = async (db: SQLite.SQLiteDatabase) => {
-  const results = await db.executeSql(`SELECT * FROM company_voice LIMIT 1`);
-  return results[0].rows.length > 0 ? results[0].rows.item(0) : null;
+export const getCompanies = async (
+  db: SQLite.SQLiteDatabase,
+): Promise<{id: number; company_id: string}[]> => {
+  const results = await db.executeSql(`SELECT * FROM companies`);
+  const rows = results[0].rows;
+  const companies: {id: number; company_id: string}[] = [];
+  for (let i = 0; i < rows.length; i++) companies.push(rows.item(i));
+  return companies;
 };
 
-export const deleteCompanyVoice = async (db: SQLite.SQLiteDatabase) => {
-  await db.executeSql(`DELETE FROM company_voice`);
-};
-
-export const updateCompanyId = async (
+export const deleteCompany = async (
   db: SQLite.SQLiteDatabase,
   id: number,
-  newCompanyId: string,
-) => {
-  const updateQuery = `UPDATE company_voice SET company_id = ? WHERE id = ?`;
-  await db.executeSql(updateQuery, [newCompanyId, id]);
+): Promise<void> => {
+  await db.executeSql(`DELETE FROM companies WHERE id = ?`, [id]);
+};
+
+export const getVoice = async (db: SQLite.SQLiteDatabase): Promise<string> => {
+  const results = await db.executeSql(
+    `SELECT voice FROM settings WHERE id = 1`,
+  );
+  return results[0].rows.length > 0 ? results[0].rows.item(0).voice : '';
+};
+
+export const setVoice = async (
+  db: SQLite.SQLiteDatabase,
+  voice: string,
+): Promise<void> => {
+  await db.executeSql(`UPDATE settings SET voice = ? WHERE id = 1`, [voice]);
 };
