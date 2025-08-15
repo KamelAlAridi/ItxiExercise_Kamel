@@ -14,7 +14,11 @@ export default function SettingsBottomSheet() {
       screenOptions={{
         headerShown: true,
       }}>
-      <SettingsStack.Screen name="Settings" component={SettingsScreen} />
+      <SettingsStack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{headerBackVisible: false}}
+      />
       <SettingsStack.Screen name="SetCompanyId" component={SetCompIDScreen} />
       <SettingsStack.Screen name="PickVoice" component={PickVoiceScreen} />
       <SettingsStack.Screen

@@ -11,6 +11,7 @@ import {RootStackParams} from './src/types/types';
 import MainScreen from './src/screens/MainScreen';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import OnboardingStackScreen from './src/navigation/OnboardingStack';
+import VoicebotScreen from './src/screens/VoicebotScreen';
 
 const RootStack = createNativeStackNavigator<RootStackParams>();
 
@@ -30,13 +31,15 @@ function App(): JSX.Element {
           backgroundColor={backgroundStyle.backgroundColor}
         />
         <NavigationContainer>
-          <RootStack.Navigator screenOptions={{headerShown: false}}>
+          <RootStack.Navigator>
             <RootStack.Screen name="Splash" component={SplashScreen} />
             <RootStack.Screen
               name="OnboardingStack"
               component={OnboardingStackScreen}
+              options={{headerShown: false}}
             />
             <RootStack.Screen name="MainStack" component={MainScreen} />
+            <RootStack.Screen name="VoicebotModal" component={VoicebotScreen} />
           </RootStack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
