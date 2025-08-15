@@ -35,11 +35,13 @@ export const createTables = async (
 export const addCompany = async (
   db: SQLite.SQLiteDatabase,
   companyId: string,
-): Promise<void> => {
-  await db.executeSql(
+): Promise<boolean> => {
+  const result = await db.executeSql(
     `INSERT OR IGNORE INTO companies (company_id) VALUES (?)`,
     [companyId],
   );
+
+  return result[0].rowsAffected > 0;
 };
 
 export const getCompanies = async (
