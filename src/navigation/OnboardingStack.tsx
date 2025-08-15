@@ -13,7 +13,7 @@ export default function OnboardingStackScreen() {
       <OnboardingStack.Screen
         name="Welcome"
         component={WelcomeScreen}
-        options={{headerBackVisible: false}}
+        options={{headerBackVisible: false, headerShown: false}}
       />
       <OnboardingStack.Screen
         name="EnterCompanyId"
