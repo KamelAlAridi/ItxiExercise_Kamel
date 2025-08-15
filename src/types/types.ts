@@ -11,5 +11,12 @@ export type RootStackParams = {
   OnboardingStack: NavigatorScreenParams<OnboardingStackParams>;
   MainStack: undefined;
   VoicebotModal: undefined;
-  SettingsModal: undefined;
+  SettingsStack: NavigatorScreenParams<SettingsStackParams>;
+};
+
+export type SettingsStackParams = {
+  Settings: undefined;
+  SetCompanyId: undefined;
+  EnterCompanyId: undefined;
+  PickVoice: undefined;
 };
