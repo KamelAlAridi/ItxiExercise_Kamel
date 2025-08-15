@@ -1,11 +1,7 @@
 import {View, Text, Button, StyleSheet, Alert} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {
-  OnboardingStackParams,
-  RootStackParams,
-  SettingsStackParams,
-} from '../types/types';
+import {OnboardingStackParams, RootStackParams} from '../types/types';
 import {CompositeScreenProps} from '@react-navigation/native';
 import {getDBConnection, setVoice, getVoice} from '../services/database';
 import {Picker} from '@react-native-picker/picker';
@@ -35,12 +31,12 @@ export default function PickVoiceScreen({navigation, route}: Props) {
   const handleSaveVoice = async (Voice: string): Promise<void> => {
     setSelectedVoice(Voice);
 
-    if (!selectedVoice) {
+    if (!Voice) {
       Alert.alert('Please select a Voice');
       return;
     }
     const db = await getDBConnection();
-    await setVoice(db, selectedVoice);
+    await setVoice(db, Voice);
   };
   return (
     <View>
