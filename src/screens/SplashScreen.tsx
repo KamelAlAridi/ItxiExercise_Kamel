@@ -1,6 +1,7 @@
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParams} from '../types/types';
+import React from 'react';
 import {useEffect} from 'react';
 import {
   createTables,
