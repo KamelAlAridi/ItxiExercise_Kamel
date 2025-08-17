@@ -57,7 +57,11 @@ function App(): JSX.Element {
             <RootStack.Screen
               name="VoicebotModal"
               component={VoicebotScreen}
-              options={{headerTitle: 'Voice bot'}}
+              options={{
+                headerTitle: 'Voice bot',
+                presentation: 'modal',
+                animation: 'none',
+              }}
             />
           </RootStack.Navigator>
         </NavigationContainer>
