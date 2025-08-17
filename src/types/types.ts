@@ -3,7 +3,6 @@ import {NavigatorScreenParams} from '@react-navigation/native';
 export type OnboardingStackParams = {
   Welcome: undefined;
   EnterCompanyId: {fromSettings?: boolean} | undefined;
-  PickVoice: {fromSettings?: boolean} | undefined;
 };
 
 export type RootStackParams = {
@@ -11,6 +10,7 @@ export type RootStackParams = {
   OnboardingStack: NavigatorScreenParams<OnboardingStackParams>;
   MainStack: undefined;
   VoicebotModal: undefined;
+  PickVoice: {fromSettings?: boolean} | undefined;
   SettingsStack: NavigatorScreenParams<SettingsStackParams>;
 };
 

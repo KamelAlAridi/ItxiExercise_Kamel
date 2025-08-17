@@ -1,17 +1,13 @@
-import {View, Text, Button, StyleSheet, Alert} from 'react-native';
+import {View, Text, StyleSheet, Alert} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {OnboardingStackParams, RootStackParams} from '../types/types';
-import {CompositeScreenProps} from '@react-navigation/native';
+import {RootStackParams} from '../types/types';
 import {getDBConnection, setVoice, getVoice} from '../services/database';
 import {Picker} from '@react-native-picker/picker';
 import GradientCircles from '../components/GradientCircles';
 import GradientButton from '../components/GradientButton';
 
-type Props = CompositeScreenProps<
-  NativeStackScreenProps<OnboardingStackParams, 'PickVoice'>,
-  NativeStackScreenProps<RootStackParams>
->;
+type Props = NativeStackScreenProps<RootStackParams, 'PickVoice'>;
 
 export default function PickVoiceScreen({navigation, route}: Props) {
   const [selectedVoice, setSelectedVoice] = useState<string>('');
@@ -80,10 +76,7 @@ export default function PickVoiceScreen({navigation, route}: Props) {
           </Picker>
         </View>
         {!fromSettings && (
-          <GradientButton
-            text="Continue"
-            onpress={() => navigation.navigate('MainStack')}
-          />
+          <GradientButton text="Dismiss" onpress={() => navigation.goBack()} />
         )}
       </View>
     </View>

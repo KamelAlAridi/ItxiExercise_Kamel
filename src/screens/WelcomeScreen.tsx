@@ -8,16 +8,16 @@ import GradientCircles from '../components/GradientCircles';
 type Props = NativeStackScreenProps<OnboardingStackParams, 'Welcome'>;
 
 export default function WelcomeScreen({navigation}: Props) {
-  function handlePress(): void {
-    navigation.navigate('EnterCompanyId');
-  }
   return (
     <View style={styles.container}>
       <GradientCircles />
 
       <View style={styles.content}>
         <Text style={styles.title}>Welcome</Text>
-        <GradientButton text="Get Started" onpress={handlePress} />
+        <GradientButton
+          text="Get Started"
+          onpress={() => navigation.push('EnterCompanyId')}
+        />
       </View>
     </View>
   );

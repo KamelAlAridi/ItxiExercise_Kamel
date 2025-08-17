@@ -20,14 +20,6 @@ export default function OnboardingStackScreen() {
         component={EnterCompIDScreen}
         options={{title: 'Enter Company ID'}}
       />
-      <OnboardingStack.Screen
-        name="PickVoice"
-        component={PickVoiceScreen}
-        options={{
-          title: 'Select Voice',
-          headerBackTitle: 'Back',
-        }}
-      />
     </OnboardingStack.Navigator>
   );
 }

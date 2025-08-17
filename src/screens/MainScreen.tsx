@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Platform,
-  Button,
-  StyleSheet,
-} from 'react-native';
+import {View, Text, TouchableOpacity, Platform, StyleSheet} from 'react-native';
 import React, {useCallback, useLayoutEffect, useMemo, useRef} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParams} from '../types/types';

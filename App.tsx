@@ -12,6 +12,7 @@ import MainScreen from './src/screens/MainScreen';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import OnboardingStackScreen from './src/navigation/OnboardingStack';
 import VoicebotScreen from './src/screens/VoicebotScreen';
+import PickVoiceScreen from './src/screens/PickVoiceScreen';
 
 const RootStack = createNativeStackNavigator<RootStackParams>();
 
@@ -42,8 +43,22 @@ function App(): JSX.Element {
               component={OnboardingStackScreen}
               options={{headerShown: false}}
             />
+            <RootStack.Screen
+              name="PickVoice"
+              component={PickVoiceScreen}
+              options={{
+                title: 'Select Voice',
+                headerBackTitle: 'Back',
+                presentation: 'modal',
+                animation: 'slide_from_bottom',
+              }}
+            />
             <RootStack.Screen name="MainStack" component={MainScreen} />
-            <RootStack.Screen name="VoicebotModal" component={VoicebotScreen} />
+            <RootStack.Screen
+              name="VoicebotModal"
+              component={VoicebotScreen}
+              options={{headerTitle: 'Voice bot'}}
+            />
           </RootStack.Navigator>
         </NavigationContainer>
       </SafeAreaView>

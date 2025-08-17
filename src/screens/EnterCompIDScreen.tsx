@@ -1,15 +1,22 @@
 import {View, Text, StyleSheet, Button, Alert, TextInput} from 'react-native';
 import React, {useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {OnboardingStackParams, SettingsStackParams} from '../types/types';
+import {
+  OnboardingStackParams,
+  RootStackParams,
+  SettingsStackParams,
+} from '../types/types';
 import {getDBConnection, addCompany} from '../services/database';
-import {CompositeScreenProps} from '@react-navigation/native';
+import {CommonActions, CompositeScreenProps} from '@react-navigation/native';
 import GradientCircles from '../components/GradientCircles';
 import GradientButton from '../components/GradientButton';
 
 type Props = CompositeScreenProps<
-  NativeStackScreenProps<OnboardingStackParams, 'EnterCompanyId'>,
-  NativeStackScreenProps<SettingsStackParams, 'EnterCompanyId'>
+  CompositeScreenProps<
+    NativeStackScreenProps<OnboardingStackParams, 'EnterCompanyId'>,
+    NativeStackScreenProps<SettingsStackParams, 'EnterCompanyId'>
+  >,
+  NativeStackScreenProps<RootStackParams>
 >;
 
 export default function EnterCompIDScreen({navigation, route}: Props) {
@@ -38,7 +45,12 @@ export default function EnterCompIDScreen({navigation, route}: Props) {
     }
 
     if (!fromSettings) {
-      navigation.navigate('PickVoice');
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 1,
+          routes: [{name: 'MainStack'}, {name: 'PickVoice'}],
+        }),
+      );
     } else {
       setMessage('Company Id added');
       setCompanyId('');
