@@ -1,22 +1,92 @@
-import {View, Text, TouchableOpacity, Platform, StyleSheet} from 'react-native';
-import React, {useCallback, useLayoutEffect, useMemo, useRef} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Platform,
+  StyleSheet,
+  Linking,
+  DeviceEventEmitter,
+} from 'react-native';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParams} from '../types/types';
+import {RootStackParams, SettingsStackParams} from '../types/types';
 import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
 import Icon from 'react-native-vector-icons/Ionicons';
-import SettingsBottomSheet from '../navigation/SettingsBottomSheet';
+import SettingsBottomSheet, {
+  settingsNavigationRef,
+} from '../navigation/SettingsBottomSheet';
 import GradientCircles from '../components/GradientCircles';
 import GradientButton from '../components/GradientButton';
+import {CompositeScreenProps} from '@react-navigation/native';
 
-type Props = NativeStackScreenProps<RootStackParams, 'MainStack'>;
+type Props = CompositeScreenProps<
+  NativeStackScreenProps<RootStackParams, 'MainStack'>,
+  NativeStackScreenProps<SettingsStackParams>
+>;
 
 export default function MainScreen({navigation}: Props) {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['50%', '95%'], []);
 
+  const [pendingDeepLink, setPendingDeepLink] = useState<string | null>(null);
+  const [navReady, setNavReady] = useState<boolean>(false);
+
   const handleOpenSettings = useCallback(() => {
     bottomSheetRef.current?.expand();
   }, []);
+
+  const handleDeepLink = useCallback(
+    (url: string | null) => {
+      if (!url) return;
+      if (url.includes('set-company-id')) {
+        if (navReady) {
+          bottomSheetRef.current?.expand();
+          const interval = setInterval(() => {
+            if (settingsNavigationRef.current) {
+              settingsNavigationRef.current.navigate('SetCompanyId');
+              clearInterval(interval);
+            }
+          }, 50);
+        } else {
+          setPendingDeepLink(url);
+        }
+      }
+    },
+    [navReady],
+  );
+
+  useEffect(() => {
+    const subscription = Linking.addEventListener('url', event =>
+      handleDeepLink(event.url),
+    );
+    const emitterSubscription = DeviceEventEmitter.addListener(
+      'coldDeepLink',
+      handleDeepLink,
+    );
+
+    Linking.getInitialURL().then(url => {
+      if (url) handleDeepLink(url);
+    });
+
+    return () => {
+      subscription.remove();
+      emitterSubscription.remove();
+    };
+  }, [handleDeepLink]);
+
+  useEffect(() => {
+    if (navReady && pendingDeepLink) {
+      handleDeepLink(pendingDeepLink);
+      setPendingDeepLink(null);
+    }
+  }, [navReady, pendingDeepLink, handleDeepLink]);
 
   const HeaderLeftButton = useCallback(
     () => (
@@ -71,7 +141,7 @@ export default function MainScreen({navigation}: Props) {
         backgroundStyle={styles.bottomSheetBackground}
         handleIndicatorStyle={styles.bottomSheetHandle}>
         <BottomSheetView style={styles.bottomSheetContent}>
-          <SettingsBottomSheet />
+          <SettingsBottomSheet onNavReady={() => setNavReady(true)} />
         </BottomSheetView>
       </BottomSheet>
     </View>

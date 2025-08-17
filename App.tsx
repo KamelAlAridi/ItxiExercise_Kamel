@@ -1,11 +1,17 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React from 'react';
-import {SafeAreaView, StatusBar, useColorScheme} from 'react-native';
+import React, {useRef} from 'react';
+import {
+  DeviceEventEmitter,
+  Linking,
+  SafeAreaView,
+  StatusBar,
+  useColorScheme,
+} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import SplashScreen from './src/screens/SplashScreen';
 
-import {NavigationContainer} from '@react-navigation/native';
+import {LinkingOptions, NavigationContainer} from '@react-navigation/native';
 import {RootStackParams} from './src/types/types';
 
 import MainScreen from './src/screens/MainScreen';
@@ -16,12 +22,35 @@ import PickVoiceScreen from './src/screens/PickVoiceScreen';
 
 const RootStack = createNativeStackNavigator<RootStackParams>();
 
+const linking: LinkingOptions<RootStackParams> = {
+  prefixes: ['itxiexercise://'],
+  config: {
+    screens: {
+      Splash: 'splash',
+      OnboardingStack: 'onboarding',
+      MainStack: 'main',
+    },
+  },
+};
+
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const navigationRef = useRef<any>(null);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
     flex: 1,
+  };
+
+  const handleNavReady = async () => {
+    const url = await Linking.getInitialURL();
+    if (url?.includes('set-company-id')) {
+      navigationRef.current?.navigate('MainStack');
+
+      setTimeout(() => {
+        DeviceEventEmitter.emit('coldDeepLink', url);
+      }, 100);
+    }
   };
 
   return (
@@ -31,7 +60,10 @@ function App(): JSX.Element {
           barStyle={isDarkMode ? 'light-content' : 'dark-content'}
           backgroundColor={backgroundStyle.backgroundColor}
         />
-        <NavigationContainer>
+        <NavigationContainer
+          linking={linking}
+          ref={navigationRef}
+          onReady={handleNavReady}>
           <RootStack.Navigator>
             <RootStack.Screen
               name="Splash"
