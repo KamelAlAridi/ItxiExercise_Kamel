@@ -1,11 +1,11 @@
 import WelcomeScreen from '../screens/WelcomeScreen';
 import EnterCompIDScreen from '../screens/EnterCompIDScreen';
 import PickVoiceScreen from '../screens/PickVoiceScreen';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createStackNavigator} from '@react-navigation/stack';
 import {OnboardingStackParams} from '../types/types';
 import React from 'react';
 
-const OnboardingStack = createNativeStackNavigator<OnboardingStackParams>();
+const OnboardingStack = createStackNavigator<OnboardingStackParams>();
 
 export default function OnboardingStackScreen() {
   return (
@@ -13,12 +13,20 @@ export default function OnboardingStackScreen() {
       <OnboardingStack.Screen
         name="Welcome"
         component={WelcomeScreen}
-        options={{headerBackVisible: false, headerShown: false}}
+        options={{headerShown: false}}
       />
       <OnboardingStack.Screen
         name="EnterCompanyId"
         component={EnterCompIDScreen}
         options={{title: 'Enter Company ID'}}
+      />
+      <OnboardingStack.Screen
+        name="PickVoice"
+        component={PickVoiceScreen}
+        options={{
+          title: 'Select Voice',
+          headerBackTitle: 'Back',
+        }}
       />
     </OnboardingStack.Navigator>
   );

@@ -1,5 +1,4 @@
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParams} from '../types/types';
 import React from 'react';
 import {useEffect} from 'react';
@@ -9,8 +8,9 @@ import {
   getDBConnection,
 } from '../services/database';
 import GradientCircles from '../components/GradientCircles';
+import {StackScreenProps} from '@react-navigation/stack';
 
-type Props = NativeStackScreenProps<RootStackParams, 'Splash'>;
+type Props = StackScreenProps<RootStackParams, 'Splash'>;
 
 export default function SplashScreen({navigation}: Props) {
   useEffect(() => {

@@ -1,4 +1,4 @@
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createStackNavigator} from '@react-navigation/stack';
 import React, {useEffect} from 'react';
 import {SettingsStackParams} from '../types/types';
 import SettingsScreen from '../screens/SettingsScreen';
@@ -11,7 +11,7 @@ import {createNavigationContainerRef} from '@react-navigation/native';
 export const settingsNavigationRef =
   createNavigationContainerRef<SettingsStackParams>();
 
-const SettingsStack = createNativeStackNavigator<SettingsStackParams>();
+const SettingsStack = createStackNavigator<SettingsStackParams>();
 
 type Props = {
   onNavReady?: () => void;
@@ -31,7 +31,7 @@ export default function SettingsBottomSheet({onNavReady}: Props) {
         <SettingsStack.Screen
           name="Settings"
           component={SettingsScreen}
-          options={{headerBackVisible: false}}
+          options={{headerLeft: () => null}}
         />
         <SettingsStack.Screen name="SetCompanyId" component={SetCompIDScreen} />
         <SettingsStack.Screen name="PickVoice" component={PickVoiceScreen} />

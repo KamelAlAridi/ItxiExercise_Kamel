@@ -1,11 +1,11 @@
 import {View, StyleSheet, Text} from 'react-native';
 import React from 'react';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {OnboardingStackParams} from '../types/types';
 import GradientButton from '../components/GradientButton';
 import GradientCircles from '../components/GradientCircles';
+import {StackScreenProps} from '@react-navigation/stack';
 
-type Props = NativeStackScreenProps<OnboardingStackParams, 'Welcome'>;
+type Props = StackScreenProps<OnboardingStackParams, 'Welcome'>;
 
 export default function WelcomeScreen({navigation}: Props) {
   return (

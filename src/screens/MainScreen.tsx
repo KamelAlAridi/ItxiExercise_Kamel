@@ -15,7 +15,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParams, SettingsStackParams} from '../types/types';
 import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -25,10 +24,11 @@ import SettingsBottomSheet, {
 import GradientCircles from '../components/GradientCircles';
 import GradientButton from '../components/GradientButton';
 import {CompositeScreenProps} from '@react-navigation/native';
+import {StackScreenProps} from '@react-navigation/stack';
 
 type Props = CompositeScreenProps<
-  NativeStackScreenProps<RootStackParams, 'MainStack'>,
-  NativeStackScreenProps<SettingsStackParams>
+  StackScreenProps<RootStackParams, 'MainStack'>,
+  StackScreenProps<SettingsStackParams>
 >;
 
 export default function MainScreen({navigation}: Props) {

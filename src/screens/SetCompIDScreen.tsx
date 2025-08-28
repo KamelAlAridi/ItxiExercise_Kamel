@@ -1,14 +1,14 @@
 import {View, Text, StyleSheet} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {SettingsStackParams} from '../types/types';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {getCompanies, getDBConnection} from '../services/database';
 import CompanyIdCard from '../components/CompanyIdCard';
 import GradientCircles from '../components/GradientCircles';
 import GradientButton from '../components/GradientButton';
 import {BottomSheetFlatList} from '@gorhom/bottom-sheet';
+import {StackScreenProps} from '@react-navigation/stack';
 
-type Props = NativeStackScreenProps<SettingsStackParams, 'SetCompanyId'>;
+type Props = StackScreenProps<SettingsStackParams, 'SetCompanyId'>;
 
 export default function SetCompIDScreen({navigation}: Props) {
   const [companies, setCompanies] = useState<

@@ -1,4 +1,4 @@
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createStackNavigator} from '@react-navigation/stack';
 import React, {useRef} from 'react';
 import {
   DeviceEventEmitter,
@@ -20,7 +20,7 @@ import OnboardingStackScreen from './src/navigation/OnboardingStack';
 import VoicebotScreen from './src/screens/VoicebotScreen';
 import PickVoiceScreen from './src/screens/PickVoiceScreen';
 
-const RootStack = createNativeStackNavigator<RootStackParams>();
+const RootStack = createStackNavigator<RootStackParams>();
 
 const linking: LinkingOptions<RootStackParams> = {
   prefixes: ['itxiexercise://'],
@@ -75,24 +75,13 @@ function App(): JSX.Element {
               component={OnboardingStackScreen}
               options={{headerShown: false}}
             />
-            <RootStack.Screen
-              name="PickVoice"
-              component={PickVoiceScreen}
-              options={{
-                title: 'Select Voice',
-                headerBackTitle: 'Back',
-                presentation: 'modal',
-                animation: 'slide_from_bottom',
-              }}
-            />
             <RootStack.Screen name="MainStack" component={MainScreen} />
             <RootStack.Screen
               name="VoicebotModal"
               component={VoicebotScreen}
               options={{
                 headerTitle: 'Voice bot',
-                presentation: 'modal',
-                animation: 'none',
+                //fix
               }}
             />
           </RootStack.Navigator>
