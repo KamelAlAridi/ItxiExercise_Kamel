@@ -2,7 +2,7 @@ import {View, Text, StyleSheet, Alert, TextInput} from 'react-native';
 import React, {useState} from 'react';
 import {OnboardingStackParams, SettingsStackParams} from '../types/types';
 import {getDBConnection, addCompany} from '../services/database';
-import {CommonActions, CompositeScreenProps} from '@react-navigation/native';
+import {CompositeScreenProps} from '@react-navigation/native';
 import GradientCircles from '../components/GradientCircles';
 import GradientButton from '../components/GradientButton';
 import {StackScreenProps} from '@react-navigation/stack';
@@ -39,22 +39,6 @@ export default function EnterCompIDScreen({navigation, route}: Props) {
 
     if (!fromSettings) {
       navigation.push('PickVoice');
-      // const rootNavigation = navigation.getParent();
-      // rootNavigation?.dispatch(
-      //   CommonActions.reset({
-      //     index: 1,
-      //     routes: [
-      //       {name: 'MainStack'},
-      //       {
-      //         name: 'OnboardingStack',
-      //         state: {
-      //           routes: [{name: 'PickVoice'}],
-      //           index: 0,
-      //         },
-      //       },
-      //     ],
-      //   }),
-      // );
     } else {
       setMessage('Company Id added');
       setCompanyId('');
