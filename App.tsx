@@ -1,4 +1,4 @@
-import {createStackNavigator} from '@react-navigation/stack';
+import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
 import React, {useRef} from 'react';
 import {
   DeviceEventEmitter,
@@ -18,7 +18,6 @@ import MainScreen from './src/screens/MainScreen';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import OnboardingStackScreen from './src/navigation/OnboardingStack';
 import VoicebotScreen from './src/screens/VoicebotScreen';
-import PickVoiceScreen from './src/screens/PickVoiceScreen';
 
 const RootStack = createStackNavigator<RootStackParams>();
 
@@ -73,7 +72,9 @@ function App(): JSX.Element {
             <RootStack.Screen
               name="OnboardingStack"
               component={OnboardingStackScreen}
-              options={{headerShown: false}}
+              options={{
+                headerShown: false,
+              }}
             />
             <RootStack.Screen name="MainStack" component={MainScreen} />
             <RootStack.Screen

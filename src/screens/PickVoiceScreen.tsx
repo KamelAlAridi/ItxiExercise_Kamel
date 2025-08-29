@@ -1,5 +1,5 @@
-import {View, Text, StyleSheet, Alert} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import {View, Text, StyleSheet, Alert, Animated} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
 import {OnboardingStackParams, RootStackParams} from '../types/types';
 import {getDBConnection, setVoice, getVoice} from '../services/database';
 import {Picker} from '@react-native-picker/picker';
@@ -7,6 +7,7 @@ import GradientCircles from '../components/GradientCircles';
 import GradientButton from '../components/GradientButton';
 import {CompositeScreenProps} from '@react-navigation/native';
 import {StackScreenProps} from '@react-navigation/stack';
+import {Dimensions} from 'react-native';
 
 type Props = CompositeScreenProps<
   StackScreenProps<OnboardingStackParams, 'PickVoice'>,
@@ -17,6 +18,56 @@ export default function PickVoiceScreen({navigation, route}: Props) {
   const [selectedVoice, setSelectedVoice] = useState<string>('');
 
   const fromSettings: boolean = route.params?.fromSettings === true;
+
+  const width = Dimensions.get('window').width;
+  const height = Dimensions.get('window').height;
+
+  const openAnim = useRef(new Animated.Value(0)).current;
+  const closeAnim = useRef(new Animated.Value(0)).current;
+  const isClosingRef = useRef(false);
+
+  useEffect(() => {
+    Animated.timing(openAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [openAnim]);
+
+  useEffect(() => {
+    const beforeRemoveHandler = (e: any) => {
+      if (isClosingRef.current) return;
+      e.preventDefault();
+
+      isClosingRef.current = true;
+      navigation.dispatch(e.data.action);
+
+      Animated.timing(closeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    };
+    const unsubscribe = navigation.addListener(
+      'beforeRemove',
+      beforeRemoveHandler,
+    );
+    return unsubscribe;
+  }, [navigation, closeAnim]);
+
+  const runCloseAndThen = (cb?: () => void) => {
+    if (isClosingRef.current) return;
+    isClosingRef.current = true;
+
+    if (cb) cb();
+    else navigation.goBack();
+
+    Animated.timing(closeAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
 
   useEffect(() => {
     const loadVoice = async () => {
@@ -40,8 +91,20 @@ export default function PickVoiceScreen({navigation, route}: Props) {
     const db = await getDBConnection();
     await setVoice(db, Voice);
   };
+
+  const translateX = openAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [width, 0],
+  });
+
+  const translateY = closeAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, height],
+  });
+
   return (
-    <View style={styles.container}>
+    <Animated.View
+      style={[styles.container, {transform: [{translateX}, {translateY}]}]}>
       <GradientCircles />
       <View style={styles.content}>
         <Text style={styles.title}>Pick a Voice</Text>
@@ -82,11 +145,13 @@ export default function PickVoiceScreen({navigation, route}: Props) {
         {!fromSettings && (
           <GradientButton
             text="Dismiss"
-            onpress={() => navigation.navigate('MainStack')}
+            onpress={() => {
+              runCloseAndThen(() => navigation.navigate('MainStack'));
+            }}
           />
         )}
       </View>
-    </View>
+    </Animated.View>
   );
 }
 

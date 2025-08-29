@@ -1,7 +1,11 @@
 import WelcomeScreen from '../screens/WelcomeScreen';
 import EnterCompIDScreen from '../screens/EnterCompIDScreen';
 import PickVoiceScreen from '../screens/PickVoiceScreen';
-import {createStackNavigator} from '@react-navigation/stack';
+import {
+  CardStyleInterpolators,
+  createStackNavigator,
+  TransitionSpecs,
+} from '@react-navigation/stack';
 import {OnboardingStackParams} from '../types/types';
 import React from 'react';
 
@@ -9,7 +13,12 @@ const OnboardingStack = createStackNavigator<OnboardingStackParams>();
 
 export default function OnboardingStackScreen() {
   return (
-    <OnboardingStack.Navigator initialRouteName="Welcome">
+    <OnboardingStack.Navigator
+      initialRouteName="Welcome"
+      screenOptions={{
+        gestureDirection: 'vertical',
+        ...TransitionSpecs.TransitionIOSSpec,
+      }}>
       <OnboardingStack.Screen
         name="Welcome"
         component={WelcomeScreen}
@@ -26,6 +35,9 @@ export default function OnboardingStackScreen() {
         options={{
           title: 'Select Voice',
           headerBackTitle: 'Back',
+          gestureEnabled: false,
+          animationEnabled: false,
+          cardStyleInterpolator: CardStyleInterpolators.forNoAnimation,
         }}
       />
     </OnboardingStack.Navigator>
