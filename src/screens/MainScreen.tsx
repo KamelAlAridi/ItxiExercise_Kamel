@@ -5,7 +5,6 @@ import {
   Platform,
   StyleSheet,
   Linking,
-  DeviceEventEmitter,
 } from 'react-native';
 import React, {
   useCallback,
@@ -31,62 +30,76 @@ type Props = CompositeScreenProps<
   StackScreenProps<SettingsStackParams>
 >;
 
-export default function MainScreen({navigation}: Props) {
+export default function MainScreen({navigation, route}: Props) {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['50%', '95%'], []);
+  const snapPoints = useMemo(() => ['100%'], []);
 
-  const [pendingDeepLink, setPendingDeepLink] = useState<string | null>(null);
-  const [navReady, setNavReady] = useState<boolean>(false);
+  const openSettingsOnStart = route.params?.openSettingsOnStart === true;
 
-  const handleOpenSettings = useCallback(() => {
-    bottomSheetRef.current?.expand();
+  const initialSheetIndexRef = useRef<number>(openSettingsOnStart ? 1 : -1);
+  const [sheetIndex, setSheetIndex] = useState<number>(
+    initialSheetIndexRef.current,
+  );
+  const [sheetClosed, setSheetClosed] = useState<boolean>(true);
+
+  const navigateToSetCompanyId = useCallback(() => {
+    const tryNav = () => {
+      if (settingsNavigationRef.current) {
+        settingsNavigationRef.current.navigate('SetCompanyId');
+        return true;
+      }
+      return false;
+    };
+    if (!tryNav()) {
+      const id = setInterval(() => {
+        if (tryNav()) clearInterval(id);
+      }, 50);
+    }
   }, []);
 
-  const handleDeepLink = useCallback(
+  const coldHandledRef = useRef(false);
+  useEffect(() => {
+    if (openSettingsOnStart && !coldHandledRef.current && sheetIndex >= 0) {
+      coldHandledRef.current = true;
+      navigateToSetCompanyId();
+      navigation.setParams({
+        openSettingsOnStart: undefined,
+        deepLink: undefined,
+      });
+    }
+  }, [openSettingsOnStart, sheetIndex, navigateToSetCompanyId, navigation]);
+
+  const handleWarmDeepLink = useCallback(
     (url: string | null) => {
       if (!url) return;
       if (url.includes('set-company-id')) {
-        if (navReady) {
-          bottomSheetRef.current?.expand();
-          const interval = setInterval(() => {
-            if (settingsNavigationRef.current) {
-              settingsNavigationRef.current.navigate('SetCompanyId');
-              clearInterval(interval);
-            }
-          }, 50);
-        } else {
-          setPendingDeepLink(url);
-        }
+        bottomSheetRef.current?.expand();
+        navigateToSetCompanyId();
+        navigation.setParams({
+          openSettingsOnStart: undefined,
+          deepLink: undefined,
+        });
       }
     },
-    [navReady],
+    [navigateToSetCompanyId, navigation],
   );
 
   useEffect(() => {
-    const subscription = Linking.addEventListener('url', event =>
-      handleDeepLink(event.url),
-    );
-    const emitterSubscription = DeviceEventEmitter.addListener(
-      'coldDeepLink',
-      handleDeepLink,
-    );
+    const sub = Linking.addEventListener('url', e => handleWarmDeepLink(e.url));
+    return () => sub.remove();
+  }, [handleWarmDeepLink]);
 
-    Linking.getInitialURL().then(url => {
-      if (url) handleDeepLink(url);
-    });
+  const handleOpenSettings = useCallback(() => {
+    bottomSheetRef.current?.expand();
+    setSheetClosed(false);
+  }, []);
 
-    return () => {
-      subscription.remove();
-      emitterSubscription.remove();
-    };
-  }, [handleDeepLink]);
-
-  useEffect(() => {
-    if (navReady && pendingDeepLink) {
-      handleDeepLink(pendingDeepLink);
-      setPendingDeepLink(null);
+  const handleSheetChange = (index: number) => {
+    setSheetIndex(index);
+    if (index === -1) {
+      setSheetClosed(true);
     }
-  }, [navReady, pendingDeepLink, handleDeepLink]);
+  };
 
   const HeaderLeftButton = useCallback(
     () => (
@@ -117,9 +130,9 @@ export default function MainScreen({navigation}: Props) {
         color: '#2D3748',
         letterSpacing: 0.5,
       },
-      headerLeft: HeaderLeftButton,
+      headerLeft: sheetClosed ? HeaderLeftButton : () => <></>,
     });
-  }, [navigation, HeaderLeftButton]);
+  }, [navigation, HeaderLeftButton, sheetClosed]);
 
   return (
     <View style={styles.container}>
@@ -135,13 +148,14 @@ export default function MainScreen({navigation}: Props) {
       </View>
       <BottomSheet
         ref={bottomSheetRef}
-        index={-1}
+        index={initialSheetIndexRef.current}
+        onChange={handleSheetChange}
         snapPoints={snapPoints}
         enablePanDownToClose
         backgroundStyle={styles.bottomSheetBackground}
         handleIndicatorStyle={styles.bottomSheetHandle}>
         <BottomSheetView style={styles.bottomSheetContent}>
-          <SettingsBottomSheet onNavReady={() => setNavReady(true)} />
+          <SettingsBottomSheet />
         </BottomSheetView>
       </BottomSheet>
     </View>

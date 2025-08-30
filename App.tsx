@@ -1,12 +1,6 @@
-import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
+import {createStackNavigator} from '@react-navigation/stack';
 import React, {useRef} from 'react';
-import {
-  DeviceEventEmitter,
-  Linking,
-  SafeAreaView,
-  StatusBar,
-  useColorScheme,
-} from 'react-native';
+import {Linking, SafeAreaView, StatusBar, useColorScheme} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import SplashScreen from './src/screens/SplashScreen';
@@ -42,14 +36,28 @@ function App(): JSX.Element {
   };
 
   const handleNavReady = async () => {
-    const url = await Linking.getInitialURL();
-    if (url?.includes('set-company-id')) {
-      navigationRef.current?.navigate('MainStack');
+    try {
+      const url = await Linking.getInitialURL();
 
-      setTimeout(() => {
-        DeviceEventEmitter.emit('coldDeepLink', url);
-      }, 100);
-    }
+      if (!url || !url.includes('set-company-id')) return;
+
+      const state = navigationRef.current?.getRootState?.();
+      const alreadyHasDeepLink =
+        state?.routes?.some(
+          (r: any) =>
+            r.name === 'MainStack' &&
+            r.params?.deepLink &&
+            r.params.deepLink === url,
+        ) ?? false;
+
+      if (alreadyHasDeepLink) {
+        return;
+      }
+      navigationRef.current?.navigate('MainStack', {
+        openSettingsOnStart: true,
+        deepLink: url,
+      });
+    } catch (error) {}
   };
 
   return (
@@ -82,7 +90,7 @@ function App(): JSX.Element {
               component={VoicebotScreen}
               options={{
                 headerTitle: 'Voice bot',
-                //fix
+                animationEnabled: false,
               }}
             />
           </RootStack.Navigator>

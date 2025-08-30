@@ -9,7 +9,7 @@ export type OnboardingStackParams = {
 export type RootStackParams = {
   Splash: undefined;
   OnboardingStack: NavigatorScreenParams<OnboardingStackParams>;
-  MainStack: undefined;
+  MainStack: {openSettingsOnStart?: boolean; deepLink?: string} | undefined;
   VoicebotModal: undefined;
 
   SettingsStack: NavigatorScreenParams<SettingsStackParams>;
