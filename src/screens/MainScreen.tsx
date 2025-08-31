@@ -46,6 +46,7 @@ export default function MainScreen({navigation, route}: Props) {
     const tryNav = () => {
       if (settingsNavigationRef.current) {
         settingsNavigationRef.current.navigate('SetCompanyId');
+        setSheetClosed(false);
         return true;
       }
       return false;
@@ -74,6 +75,7 @@ export default function MainScreen({navigation, route}: Props) {
       if (!url) return;
       if (url.includes('set-company-id')) {
         bottomSheetRef.current?.expand();
+        setSheetClosed(false);
         navigateToSetCompanyId();
         navigation.setParams({
           openSettingsOnStart: undefined,
