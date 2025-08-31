@@ -36,7 +36,7 @@ export default function MainScreen({navigation, route}: Props) {
 
   const openSettingsOnStart = route.params?.openSettingsOnStart === true;
 
-  const initialSheetIndexRef = useRef<number>(openSettingsOnStart ? 1 : -1);
+  const initialSheetIndexRef = useRef<number>(openSettingsOnStart ? 0 : -1);
   const [sheetIndex, setSheetIndex] = useState<number>(
     initialSheetIndexRef.current,
   );
