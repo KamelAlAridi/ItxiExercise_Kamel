@@ -34,7 +34,11 @@ export default function SettingsBottomSheet({onNavReady}: Props) {
           options={{headerLeft: () => null}}
         />
         <SettingsStack.Screen name="SetCompanyId" component={SetCompIDScreen} />
-        <SettingsStack.Screen name="PickVoice" component={PickVoiceScreen} />
+        <SettingsStack.Screen
+          name="PickVoice"
+          component={PickVoiceScreen}
+          options={{headerLeft: () => null}}
+        />
         <SettingsStack.Screen
           name="EnterCompanyId"
           component={EnterCompIDScreen}
