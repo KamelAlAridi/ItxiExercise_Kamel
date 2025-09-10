@@ -5,7 +5,7 @@ import {getDBConnection, setVoice, getVoice} from '../services/database';
 import {Picker} from '@react-native-picker/picker';
 import GradientCircles from '../components/GradientCircles';
 import GradientButton from '../components/GradientButton';
-import {CompositeScreenProps} from '@react-navigation/native';
+import {CommonActions, CompositeScreenProps} from '@react-navigation/native';
 import {StackScreenProps} from '@react-navigation/stack';
 import {Dimensions} from 'react-native';
 
@@ -146,7 +146,14 @@ export default function PickVoiceScreen({navigation, route}: Props) {
           <GradientButton
             text="Dismiss"
             onpress={() => {
-              runCloseAndThen(() => navigation.navigate('MainStack'));
+              runCloseAndThen(() =>
+                navigation.dispatch(
+                  CommonActions.reset({
+                    index: 0,
+                    routes: [{name: 'MainStack'}],
+                  }),
+                ),
+              );
             }}
           />
         )}

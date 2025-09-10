@@ -27,9 +27,11 @@ export default function SplashScreen({navigation}: Props) {
 
       setTimeout(() => {
         if (companies.length > 0) {
-          navigation.navigate('MainStack');
+          navigation.replace('MainStack');
         } else {
-          navigation.navigate('OnboardingStack');
+          navigation.replace('OnboardingStack', {
+            screen: 'Welcome',
+          });
         }
       }, remaining);
     };
