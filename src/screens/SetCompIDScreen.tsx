@@ -7,6 +7,7 @@ import GradientCircles from '../components/GradientCircles';
 import GradientButton from '../components/GradientButton';
 import {BottomSheetFlatList} from '@gorhom/bottom-sheet';
 import {StackScreenProps} from '@react-navigation/stack';
+import {useIsFocused} from '@react-navigation/native';
 
 type Props = StackScreenProps<SettingsStackParams, 'SetCompanyId'>;
 
@@ -21,9 +22,11 @@ export default function SetCompIDScreen({navigation}: Props) {
     setCompanies(list);
   };
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
     loadCompanies();
-  }, []);
+  }, [isFocused]);
 
   return (
     <View style={styles.container}>
