@@ -1,44 +1,8 @@
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
-import {RootStackParams} from '../types/types';
 import React from 'react';
-import {useEffect} from 'react';
-import {
-  createTables,
-  getCompanies,
-  getDBConnection,
-} from '../services/database';
 import GradientCircles from '../components/GradientCircles';
-import {StackScreenProps} from '@react-navigation/stack';
 
-type Props = StackScreenProps<RootStackParams, 'Splash'>;
-
-export default function SplashScreen({navigation}: Props) {
-  useEffect(() => {
-    const checkCompany = async () => {
-      const startTime = Date.now();
-
-      const db = await getDBConnection();
-      await createTables(db);
-
-      const companies = await getCompanies(db);
-
-      const elapsed = Date.now() - startTime;
-      const remaining = Math.max(0, 3000 - elapsed);
-
-      setTimeout(() => {
-        if (companies.length > 0) {
-          navigation.replace('MainStack');
-        } else {
-          navigation.replace('OnboardingStack', {
-            screen: 'Welcome',
-          });
-        }
-      }, remaining);
-    };
-
-    checkCompany();
-  }, [navigation]);
-
+export default function SplashScreen() {
   return (
     <View style={styles.container}>
       <GradientCircles />

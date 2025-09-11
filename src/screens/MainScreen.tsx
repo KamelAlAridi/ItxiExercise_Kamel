@@ -15,7 +15,11 @@ import React, {
   useState,
 } from 'react';
 import {RootStackParams, SettingsStackParams} from '../types/types';
-import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
+import {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SettingsBottomSheet, {
   settingsNavigationRef,
@@ -31,15 +35,11 @@ type Props = CompositeScreenProps<
 >;
 
 export default function MainScreen({navigation, route}: Props) {
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['100%'], []);
+  const bottomSheetModalRef = useRef<BottomSheetModal | null>(null);
+  const snapPoints = useMemo(() => ['95%'], []);
 
   const openSettingsOnStart = route.params?.openSettingsOnStart === true;
 
-  const initialSheetIndexRef = useRef<number>(openSettingsOnStart ? 0 : -1);
-  const [sheetIndex, setSheetIndex] = useState<number>(
-    initialSheetIndexRef.current,
-  );
   const [sheetClosed, setSheetClosed] = useState<boolean>(true);
 
   const navigateToSetCompanyId = useCallback(() => {
@@ -58,50 +58,119 @@ export default function MainScreen({navigation, route}: Props) {
     }
   }, []);
 
-  const coldHandledRef = useRef(false);
-  useEffect(() => {
-    if (openSettingsOnStart && !coldHandledRef.current && sheetIndex >= 0) {
-      coldHandledRef.current = true;
-      navigateToSetCompanyId();
-      navigation.setParams({
-        openSettingsOnStart: undefined,
-        deepLink: undefined,
-      });
-    }
-  }, [openSettingsOnStart, sheetIndex, navigateToSetCompanyId, navigation]);
+  const presentPollingRef = useRef<any>(null);
+  const lastHandledUrlRef = useRef<string | null>(null);
+  const handledResetTimeoutRef = useRef<any>(null);
 
-  const handleWarmDeepLink = useCallback(
-    (url: string | null) => {
-      if (!url) return;
-      if (url.includes('set-company-id')) {
-        bottomSheetRef.current?.expand();
+  const safePresent = useCallback(() => {
+    const tryPresent = () => {
+      if (
+        bottomSheetModalRef.current &&
+        typeof bottomSheetModalRef.current.present === 'function'
+      ) {
+        bottomSheetModalRef.current.present();
         setSheetClosed(false);
-        navigateToSetCompanyId();
+        return true;
+      }
+      return false;
+    };
+
+    if (tryPresent()) return;
+
+    if (presentPollingRef.current) return;
+
+    presentPollingRef.current = setInterval(() => {
+      if (tryPresent()) {
+        if (presentPollingRef.current) {
+          clearInterval(presentPollingRef.current);
+          presentPollingRef.current = null;
+        }
+      }
+    }, 50);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (presentPollingRef.current) {
+        clearInterval(presentPollingRef.current);
+        presentPollingRef.current = null;
+      }
+      if (handledResetTimeoutRef.current) {
+        clearTimeout(handledResetTimeoutRef.current);
+        handledResetTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const handleDeepLink = (rawUrl: string | null) => {
+      if (!rawUrl || !mounted) return;
+
+      if (lastHandledUrlRef.current === rawUrl) return;
+
+      lastHandledUrlRef.current = rawUrl;
+
+      if (
+        rawUrl.includes('set-company-id') ||
+        rawUrl === '__param__openSettingsOnStart'
+      ) {
+        safePresent();
+        setTimeout(() => {
+          navigateToSetCompanyId();
+        }, 300);
+
         navigation.setParams({
           openSettingsOnStart: undefined,
           deepLink: undefined,
         });
-      }
-    },
-    [navigateToSetCompanyId, navigation],
-  );
 
-  useEffect(() => {
-    const sub = Linking.addEventListener('url', e => handleWarmDeepLink(e.url));
-    return () => sub.remove();
-  }, [handleWarmDeepLink]);
+        if (handledResetTimeoutRef.current)
+          clearTimeout(handledResetTimeoutRef.current);
+        handledResetTimeoutRef.current = setTimeout(() => {
+          lastHandledUrlRef.current = null;
+          handledResetTimeoutRef.current = null;
+        }, 4000);
+      } else {
+        lastHandledUrlRef.current = null;
+      }
+    };
+
+    (async () => {
+      try {
+        const initialUrl = await Linking.getInitialURL();
+        if (!mounted) return;
+
+        if (initialUrl) {
+          handleDeepLink(initialUrl);
+        } else if (openSettingsOnStart) {
+          handleDeepLink('__param__openSettingsOnStart');
+        }
+      } catch (err) {}
+    })();
+
+    const sub = Linking.addEventListener('url', e => {
+      handleDeepLink(e.url);
+    });
+
+    return () => {
+      mounted = false;
+      sub.remove();
+      if (handledResetTimeoutRef.current) {
+        clearTimeout(handledResetTimeoutRef.current);
+        handledResetTimeoutRef.current = null;
+      }
+    };
+  }, [safePresent, navigateToSetCompanyId, navigation, openSettingsOnStart]);
 
   const handleOpenSettings = useCallback(() => {
-    bottomSheetRef.current?.expand();
-    setSheetClosed(false);
-  }, []);
+    safePresent();
+  }, [safePresent]);
 
-  const handleSheetChange = (index: number) => {
-    setSheetIndex(index);
-    if (index === -1) {
-      setSheetClosed(true);
-    }
-  };
+  const handleDismiss = useCallback(() => {
+    setSheetClosed(true);
+  }, []);
 
   const HeaderLeftButton = useCallback(
     () => (
@@ -136,6 +205,18 @@ export default function MainScreen({navigation, route}: Props) {
     });
   }, [navigation, HeaderLeftButton, sheetClosed]);
 
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        pressBehavior="close"
+      />
+    ),
+    [],
+  );
+
   return (
     <View style={styles.container}>
       <GradientCircles />
@@ -148,18 +229,18 @@ export default function MainScreen({navigation, route}: Props) {
           onpress={() => navigation.navigate('VoicebotModal')}
         />
       </View>
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={initialSheetIndexRef.current}
-        onChange={handleSheetChange}
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
         snapPoints={snapPoints}
+        onDismiss={handleDismiss}
+        backdropComponent={renderBackdrop}
         enablePanDownToClose
         backgroundStyle={styles.bottomSheetBackground}
         handleIndicatorStyle={styles.bottomSheetHandle}>
         <BottomSheetView style={styles.bottomSheetContent}>
           <SettingsBottomSheet />
         </BottomSheetView>
-      </BottomSheet>
+      </BottomSheetModal>
     </View>
   );
 }
