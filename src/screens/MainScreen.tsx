@@ -1,11 +1,5 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Platform,
-  StyleSheet,
-  Linking,
-} from 'react-native';
+// MainScreen.tsx
+import {View, Text, TouchableOpacity, Platform, StyleSheet} from 'react-native';
 import React, {
   useCallback,
   useEffect,
@@ -58,111 +52,26 @@ export default function MainScreen({navigation, route}: Props) {
     }
   }, []);
 
-  const presentPollingRef = useRef<any>(null);
-  const lastHandledUrlRef = useRef<string | null>(null);
-  const handledResetTimeoutRef = useRef<any>(null);
-
   const safePresent = useCallback(() => {
-    const tryPresent = () => {
-      if (
-        bottomSheetModalRef.current &&
-        typeof bottomSheetModalRef.current.present === 'function'
-      ) {
-        bottomSheetModalRef.current.present();
-        setSheetClosed(false);
-        return true;
-      }
-      return false;
-    };
-
-    if (tryPresent()) return;
-
-    if (presentPollingRef.current) return;
-
-    presentPollingRef.current = setInterval(() => {
-      if (tryPresent()) {
-        if (presentPollingRef.current) {
-          clearInterval(presentPollingRef.current);
-          presentPollingRef.current = null;
-        }
-      }
-    }, 50);
+    if (bottomSheetModalRef.current?.present) {
+      bottomSheetModalRef.current.present();
+      setSheetClosed(false);
+    }
   }, []);
 
   useEffect(() => {
-    return () => {
-      if (presentPollingRef.current) {
-        clearInterval(presentPollingRef.current);
-        presentPollingRef.current = null;
-      }
-      if (handledResetTimeoutRef.current) {
-        clearTimeout(handledResetTimeoutRef.current);
-        handledResetTimeoutRef.current = null;
-      }
-    };
-  }, []);
+    if (openSettingsOnStart) {
+      safePresent();
+      setTimeout(() => {
+        navigateToSetCompanyId();
+      }, 300);
 
-  useEffect(() => {
-    let mounted = true;
-
-    const handleDeepLink = (rawUrl: string | null) => {
-      if (!rawUrl || !mounted) return;
-
-      if (lastHandledUrlRef.current === rawUrl) return;
-
-      lastHandledUrlRef.current = rawUrl;
-
-      if (
-        rawUrl.includes('set-company-id') ||
-        rawUrl === '__param__openSettingsOnStart'
-      ) {
-        safePresent();
-        setTimeout(() => {
-          navigateToSetCompanyId();
-        }, 300);
-
-        navigation.setParams({
-          openSettingsOnStart: undefined,
-          deepLink: undefined,
-        });
-
-        if (handledResetTimeoutRef.current)
-          clearTimeout(handledResetTimeoutRef.current);
-        handledResetTimeoutRef.current = setTimeout(() => {
-          lastHandledUrlRef.current = null;
-          handledResetTimeoutRef.current = null;
-        }, 4000);
-      } else {
-        lastHandledUrlRef.current = null;
-      }
-    };
-
-    (async () => {
-      try {
-        const initialUrl = await Linking.getInitialURL();
-        if (!mounted) return;
-
-        if (initialUrl) {
-          handleDeepLink(initialUrl);
-        } else if (openSettingsOnStart) {
-          handleDeepLink('__param__openSettingsOnStart');
-        }
-      } catch (err) {}
-    })();
-
-    const sub = Linking.addEventListener('url', e => {
-      handleDeepLink(e.url);
-    });
-
-    return () => {
-      mounted = false;
-      sub.remove();
-      if (handledResetTimeoutRef.current) {
-        clearTimeout(handledResetTimeoutRef.current);
-        handledResetTimeoutRef.current = null;
-      }
-    };
-  }, [safePresent, navigateToSetCompanyId, navigation, openSettingsOnStart]);
+      navigation.setParams({
+        openSettingsOnStart: undefined,
+        deepLink: undefined,
+      });
+    }
+  }, [openSettingsOnStart, navigation, navigateToSetCompanyId, safePresent]);
 
   const handleOpenSettings = useCallback(() => {
     safePresent();
@@ -233,15 +142,16 @@ export default function MainScreen({navigation, route}: Props) {
           onpress={() => navigation.navigate('VoicebotModal')}
         />
       </View>
+
       <BottomSheetModal
         ref={bottomSheetModalRef}
         snapPoints={snapPoints}
         onDismiss={handleDismiss}
         backdropComponent={renderBackdrop}
         enablePanDownToClose
+        enableContentPanningGesture
         backgroundStyle={styles.bottomSheetBackground}
-        handleIndicatorStyle={styles.bottomSheetHandle}
-        enableContentPanningGesture={true}>
+        handleIndicatorStyle={styles.bottomSheetHandle}>
         <BottomSheetView style={styles.bottomSheetContent}>
           <SettingsBottomSheet onCloseBottomSheet={handleCloseBottomSheet} />
         </BottomSheetView>
@@ -251,10 +161,7 @@ export default function MainScreen({navigation, route}: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
+  container: {flex: 1, backgroundColor: '#F9FAFB'},
   content: {
     flex: 1,
     justifyContent: 'center',
@@ -270,9 +177,7 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     maxWidth: 300,
   },
-  settingsButton: {
-    marginLeft: 15,
-  },
+  settingsButton: {marginLeft: 15},
   bottomSheetBackground: {
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,
@@ -284,7 +189,5 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 2,
   },
-  bottomSheetContent: {
-    flex: 1,
-  },
+  bottomSheetContent: {flex: 1},
 });
