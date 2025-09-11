@@ -217,6 +217,10 @@ export default function MainScreen({navigation, route}: Props) {
     [],
   );
 
+  const handleCloseBottomSheet = useCallback(() => {
+    bottomSheetModalRef.current?.dismiss();
+  }, []);
+
   return (
     <View style={styles.container}>
       <GradientCircles />
@@ -236,9 +240,10 @@ export default function MainScreen({navigation, route}: Props) {
         backdropComponent={renderBackdrop}
         enablePanDownToClose
         backgroundStyle={styles.bottomSheetBackground}
-        handleIndicatorStyle={styles.bottomSheetHandle}>
+        handleIndicatorStyle={styles.bottomSheetHandle}
+        enableContentPanningGesture={true}>
         <BottomSheetView style={styles.bottomSheetContent}>
-          <SettingsBottomSheet />
+          <SettingsBottomSheet onCloseBottomSheet={handleCloseBottomSheet} />
         </BottomSheetView>
       </BottomSheetModal>
     </View>
